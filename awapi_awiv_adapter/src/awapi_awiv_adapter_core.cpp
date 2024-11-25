@@ -41,6 +41,8 @@ AutowareIvAdapter::AutowareIvAdapter()
   autoware_state_publisher_ = std::make_unique<AutowareIvAutowareStatePublisher>(*this);
   stop_reason_aggregator_ = std::make_unique<AutowareIvStopReasonAggregator>(
     *this, stop_reason_timeout_, stop_reason_thresh_dist_);
+  velocity_factor_converter_ =
+    std::make_unique<AutowareIvVelocityFactorConverter>(*this, stop_reason_thresh_dist_);
   v2x_aggregator_ = std::make_unique<AutowareIvV2XAggregator>(*this);
   lane_change_state_publisher_ = std::make_unique<AutowareIvLaneChangeStatePublisher>(*this);
   obstacle_avoidance_state_publisher_ =
@@ -85,8 +87,10 @@ AutowareIvAdapter::AutowareIvAdapter()
     "input/mrm_state", 1, std::bind(&AutowareIvAdapter::callbackMrmState, this, _1));
   sub_hazard_status_ = this->create_subscription<autoware_system_msgs::msg::HazardStatusStamped>(
     "input/hazard_status", 1, std::bind(&AutowareIvAdapter::callbackHazardStatus, this, _1));
-  sub_stop_reason_ = this->create_subscription<tier4_planning_msgs::msg::StopReasonArray>(
-    "input/stop_reason", 100, std::bind(&AutowareIvAdapter::callbackStopReason, this, _1));
+  sub_velocity_factor_ =
+    this->create_subscription<autoware_adapi_v1_msgs::msg::VelocityFactorArray>(
+      "input/velocity_factors", 100,
+      std::bind(&AutowareIvAdapter::callbackVelocityFactor, this, _1));
   sub_v2x_command_ = this->create_subscription<tier4_v2x_msgs::msg::InfrastructureCommandArray>(
     "input/v2x_command", 100, std::bind(&AutowareIvAdapter::callbackV2XCommand, this, _1));
   sub_v2x_state_ = this->create_subscription<tier4_v2x_msgs::msg::VirtualTrafficLightStateArray>(
@@ -257,10 +261,10 @@ void AutowareIvAdapter::callbackHazardStatus(
   aw_info_.hazard_status_ptr = msg_ptr;
 }
 
-void AutowareIvAdapter::callbackStopReason(
-  const tier4_planning_msgs::msg::StopReasonArray::ConstSharedPtr msg_ptr)
+void AutowareIvAdapter::callbackVelocityFactor(
+  const autoware_adapi_v1_msgs::msg::VelocityFactorArray::ConstSharedPtr msg_ptr)
 {
-  aw_info_.stop_reason_ptr = stop_reason_aggregator_->updateStopReasonArray(msg_ptr, aw_info_);
+  aw_info_.stop_reason_ptr = velocity_factor_converter_->updateStopReasonArray(msg_ptr);
 }
 
 void AutowareIvAdapter::callbackV2XCommand(
