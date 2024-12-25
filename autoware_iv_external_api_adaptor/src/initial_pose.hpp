@@ -15,8 +15,8 @@
 #ifndef INITIAL_POSE_HPP_
 #define INITIAL_POSE_HPP_
 
-#include <autoware/component_interface_specs/localization.hpp>
-#include <autoware/component_interface_utils/rclcpp.hpp>
+#include <component_interface_specs/localization.hpp>
+#include <component_interface_utils/rclcpp.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <tier4_api_utils/tier4_api_utils.hpp>
 
@@ -39,8 +39,7 @@ private:
   rclcpp::CallbackGroup::SharedPtr group_;
   tier4_api_utils::Service<InitializePose>::SharedPtr srv_set_initialize_pose_;
   tier4_api_utils::Service<InitializePoseAuto>::SharedPtr srv_set_initialize_pose_auto_;
-  autoware::component_interface_utils::Client<
-    autoware::component_interface_specs::localization::Initialize>::SharedPtr
+  component_interface_utils::Client<localization_interface::Initialize>::SharedPtr
     cli_localization_initialize_;
 
   // ros callback

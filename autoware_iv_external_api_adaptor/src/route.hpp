@@ -15,8 +15,8 @@
 #ifndef ROUTE_HPP_
 #define ROUTE_HPP_
 
-#include "autoware/adapi_specs/routing.hpp"
-#include "autoware/component_interface_utils/rclcpp.hpp"
+#include "autoware_ad_api_specs/routing.hpp"
+#include "component_interface_utils/rclcpp.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "tier4_api_utils/tier4_api_utils.hpp"
 
@@ -44,12 +44,11 @@ private:
   tier4_api_utils::Service<SetRoute>::SharedPtr srv_set_route_;
   tier4_api_utils::Service<ClearRoute>::SharedPtr srv_clear_route_;
   rclcpp::Publisher<RouteMsg>::SharedPtr pub_get_route_;
-  autoware::component_interface_utils::Client<autoware::adapi_specs::routing::ClearRoute>::SharedPtr
+  component_interface_utils::Client<autoware_ad_api::routing::ClearRoute>::SharedPtr
     cli_clear_route_;
-  autoware::component_interface_utils::Client<autoware::adapi_specs::routing::SetRoute>::SharedPtr
-    cli_set_route_;
-  autoware::component_interface_utils::Subscription<
-    autoware::adapi_specs::routing::Route>::SharedPtr sub_get_route_;
+  component_interface_utils::Client<autoware_ad_api::routing::SetRoute>::SharedPtr cli_set_route_;
+  component_interface_utils::Subscription<autoware_ad_api::routing::Route>::SharedPtr
+    sub_get_route_;
 
   // ros callback
   void setRoute(
@@ -58,7 +57,7 @@ private:
   void clearRoute(
     const tier4_external_api_msgs::srv::ClearRoute::Request::SharedPtr request,
     const tier4_external_api_msgs::srv::ClearRoute::Response::SharedPtr response);
-  void onRoute(const autoware::adapi_specs::routing::Route::Message::ConstSharedPtr message);
+  void onRoute(const autoware_ad_api::routing::Route::Message::ConstSharedPtr message);
 };
 
 }  // namespace external_api
